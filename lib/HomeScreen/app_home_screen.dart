@@ -8,6 +8,10 @@ class ToDoAppHomeScreen extends StatefulWidget {
 }
 
 class _ToDoAppHomeScreenState extends State<ToDoAppHomeScreen> {
+
+  final TextEditingController _todoController = TextEditingController();
+  final List<TodoTask> todoList = [];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,6 +31,7 @@ class _ToDoAppHomeScreenState extends State<ToDoAppHomeScreen> {
               children: [
                 Expanded(
                   child: TextField(
+                    controller: _todoController,
                     decoration: InputDecoration(
                       // filled: true,
                       // fillColor: Colors.teal.shade100,
@@ -64,7 +69,19 @@ class _ToDoAppHomeScreenState extends State<ToDoAppHomeScreen> {
                 SizedBox(width: 10),
                 SizedBox(
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      // print("add todo button");
+                      // print("add todo: ${_todoController.text.toString()}"); 2
+                      setState(() {
+                        todoList.add(
+                            TodoTask(
+                                title: _todoController.text.toString().trim(),
+                                subTitle: "Subtitle"
+                            )
+                        );
+                      });
+
+                    },
                     style: ElevatedButton.styleFrom(
                       elevation: 0,
                       backgroundColor: Colors.white,
@@ -85,8 +102,47 @@ class _ToDoAppHomeScreenState extends State<ToDoAppHomeScreen> {
               ],
             ),
           ),
+          Expanded(child: ListView.builder(
+              padding: EdgeInsets.only(bottom: 40, top: 8, left: 8, right: 8),
+          itemCount: todoList.length,
+          itemBuilder: (BuildContext context, index){
+            return Card(
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.white,
+                      Colors.teal.shade100
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight
+                  )
+                ),
+                child: ListTile(
+                  title: Text("${todoList[index].title}"),
+                  trailing: Checkbox(value: false, onChanged: (value){}),
+                ),
+              )
+            );
+          })
+    )
         ],
       ),
     );
   }
+}
+
+class TodoTask {
+
+   String? title;
+   String? subTitle;
+   bool? taskDone;
+
+   TodoTask({
+    required this.title,
+    required this.subTitle,
+    this.taskDone = false
+  });
+
 }
