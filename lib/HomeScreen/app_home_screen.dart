@@ -12,6 +12,35 @@ class _ToDoAppHomeScreenState extends State<ToDoAppHomeScreen> {
   final TextEditingController _todoController = TextEditingController();
   final List<TodoTask> todoList = [];
 
+  void addTodo(){
+    if(_todoController.text.toString().trim().isEmpty){
+      return;
+    }
+    setState(() {
+      todoList.add(
+          TodoTask(
+              title: _todoController.text.toString().trim(),
+              subTitle: "Subtitle"
+          )
+      );
+      _todoController.clear();
+    });
+  }
+
+  void deleteTodo(int index){
+    todoList.removeAt(index);
+    setState(() {
+
+    });
+  }
+
+  void toggleDone(int index){
+    todoList[index].taskDone = !todoList[index].taskDone!;
+    setState(() {
+
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,6 +60,9 @@ class _ToDoAppHomeScreenState extends State<ToDoAppHomeScreen> {
               children: [
                 Expanded(
                   child: TextField(
+                    onChanged: (value){
+                      setState(() {});
+                    },
                     controller: _todoController,
                     decoration: InputDecoration(
                       // filled: true,
@@ -69,18 +101,8 @@ class _ToDoAppHomeScreenState extends State<ToDoAppHomeScreen> {
                 SizedBox(width: 10),
                 SizedBox(
                   child: ElevatedButton(
-                    onPressed: () {
-                      // print("add todo button");
-                      // print("add todo: ${_todoController.text.toString()}"); 2
-                      setState(() {
-                        todoList.add(
-                            TodoTask(
-                                title: _todoController.text.toString().trim(),
-                                subTitle: "Subtitle"
-                            )
-                        );
-                      });
-
+                    onPressed: _todoController.text.toString().trim().isEmpty ? null : () {
+                      addTodo();
                     },
                     style: ElevatedButton.styleFrom(
                       elevation: 0,
@@ -102,8 +124,8 @@ class _ToDoAppHomeScreenState extends State<ToDoAppHomeScreen> {
               ],
             ),
           ),
-          Expanded(child: ListView.builder(
-              padding: EdgeInsets.only(bottom: 40, top: 8, left: 8, right: 8),
+          Expanded(child: todoList.isEmpty ? Center(child: Text("No data found"),) : ListView.builder(
+          padding: EdgeInsets.only(bottom: 40, top: 8, left: 8, right: 8),
           itemCount: todoList.length,
           itemBuilder: (BuildContext context, index){
             return Card(
@@ -119,10 +141,21 @@ class _ToDoAppHomeScreenState extends State<ToDoAppHomeScreen> {
                     end: Alignment.bottomRight
                   )
                 ),
-                child: ListTile(
-                  title: Text("${todoList[index].title}"),
-                  trailing: Checkbox(value: false, onChanged: (value){}),
-                ),
+                child: Dismissible(
+                    key: Key(todoList[index].title.toString() + index.toString()),
+                    child: ListTile(
+                      title: Text(
+                        "${todoList[index].title}",
+                        style: TextStyle(
+                          decoration: todoList[index].taskDone! ? TextDecoration.lineThrough : TextDecoration.none
+                        ),
+                      ),
+                      trailing: Checkbox(value: todoList[index].taskDone, onChanged: (value){
+                        toggleDone(index);
+                      }),
+                    ),
+                  onDismissed: (_) => deleteTodo(index),
+                )
               )
             );
           })
